@@ -1,25 +1,31 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react'
+import { BrowserRouter, Routes , Route } from 'react-router-dom'
+import Lilycs from './pages/Lilycs'
+import NotFound from './NotFound'
+import Bibliograph from './pages/Bibliograph'
+import FreeMp3 from './pages/FreeMp3'
+import NavBar from './components/NavBar'
+import Footer from './components/Footer'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+export class App extends Component {
+  render() {
+    return (
+      <BrowserRouter>
+      
+      <div className='App'>
+        <NavBar/>
+        <Routes>
+          <Route exact path="/" element={<Lilycs/>}/>
+          <Route exact path="/free-mp3" element={<FreeMp3/>}/>
+          <Route exact path="/bibliograph" element={<Bibliograph/>}/>
+          <Route path="*" element={<NotFound/>}/>
+        </Routes>
+        <Footer/>
+      </div>
+      
+      </BrowserRouter>
+    )
+  }
 }
 
-export default App;
+export default App
