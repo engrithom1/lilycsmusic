@@ -1,10 +1,15 @@
 import React, { Component } from "react";
 import axios from "axios";
+import YoutubePlayer from "../components/YoutubePlayer";
 
 export class Lilycs extends Component {
+
   state = {
     artist: [],
     songs: [],
+    play_id:0,
+    video_id:"",
+    provider:""
   };
   componentDidMount = () => {
     this.getArtist();
@@ -32,6 +37,47 @@ export class Lilycs extends Component {
         console.log(err);
       });
   };
+
+  youtube_parser=(url)=>{
+    var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+    var match = url.match(regExp);
+    return (match&&match[7].length===11)? match[7] : false;
+}
+
+  playSong=(play_id, api_path)=>{
+
+    var url = 'https://genius.p.rapidapi.com'+api_path
+    console.log(url);
+  
+    var options = {
+    method: 'GET',
+    url: url,
+    headers: {
+      'x-rapidapi-host': 'genius.p.rapidapi.com',
+      'x-rapidapi-key': 'c5c827b790mshd9e1c1e76902e40p1d1630jsn9effd34b928d'
+    }
+  };
+  
+  axios.request(options).then((response) =>{
+    console.log(response.data);
+  
+    var urr = response.data['response']['song']['media'][0]['url'];
+    var provider = response.data['response']['song']['media'][0]['provider'];
+
+    console.log(urr)
+    var video_id = this.youtube_parser(urr)
+      this.setState({play_id,video_id,provider})
+      console.log('set to state')
+    
+  
+  }).catch(function (error) {
+    console.error(error);
+  });
+  
+  }
+
+
+
   render() {
     var songs = this.state.songs;
     return (
@@ -39,17 +85,12 @@ export class Lilycs extends Component {
         <section className="miscellaneous-area section-padding-100-0">
           <div className="container">
             <div className="row">
-              <div className="col-12 col-lg-4">
-                <h2>adds or something</h2>
-              </div>
-              <div className="col-md-8 col-sm-12 new-hits-area mb-50 monitor">
-                <h1>video/lilycs goes here</h1>
-              </div>
-              <div className="col-md-4 col-sm-12">
+              
+              <div className="col-md-3 col-sm-12">
                 <h2>adds or something</h2>
               </div>
 
-              <div className="col-12 col-lg-5">
+              <div className="col-12 col-lg-6">
                 <div className="new-hits-area mb-100">
                   <div
                     className="section-heading text-left mb-50 wow fadeInUp"
@@ -63,11 +104,9 @@ export class Lilycs extends Component {
                     songs.map((song) => {
                       return (
                         <div key={song.id.toString()}>
-                         <div className="w-100 mb-10">
-                            <h1>video/lilycs goes here</h1>
-                          </div>  
+                        {this.state.play_id === song.id? <YoutubePlayer video_id={this.state.video_id} provider={this.state.provider}/>:null } 
                         <div
-                          className="single-new-item d-flex align-items-center justify-content-between wow fadeInUp"
+                          className="mb-3 single-new-item d-flex align-items-center justify-content-between wow fadeInUp"
                           data-wow-delay="100ms" 
                         >
                           <div className="first-part d-flex align-items-center">
@@ -85,7 +124,7 @@ export class Lilycs extends Component {
                               <p>{song.title}</p>
                             </div>
                           </div>
-                          <button className="btn btn-success">pl</button>
+                          <button className="btn btn-success" onClick={()=>this.playSong(song.id, song.api_path)}>pl</button>
                         </div>
                         </div>
                       );
